@@ -24,7 +24,7 @@ library(LDAvis)
 ```
 
 ```{r import samples}
-count<-read.table(file = "~/Desktop/LDA-binder/KEGG_module_TPM.tsv", sep = '\t', header = TRUE, row.names=1)
+count<-read.table(file = "KEGG_module_TPM.tsv", sep = '\t', header = TRUE, row.names=1)
 count<-(as.data.frame(t(count)))
 count
 ```
@@ -95,7 +95,7 @@ ap_top_terms %>%
 ```
 
 ```{r melt}
-count<-read.csv("~/Desktop/LDA-binder/KEGG_module_TPM.csv", header=T, row.names=1)
+count<-read.csv("KEGG_module_TPM.csv", header=T, row.names=1)
 count<-t(count)
 count
 count[1,1:43][count[1,1:43]>1]<- "Low_A"
