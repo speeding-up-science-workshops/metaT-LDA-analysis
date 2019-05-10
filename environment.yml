@@ -2,7 +2,7 @@ name: example-environment
 channels:
   - conda-forge
   - bioconda
-  - christophaburke 
+  - chdoig
 dependencies:
   - r-topicmodels
   - r-reshape2
@@ -12,6 +12,7 @@ dependencies:
   - r-tidytext
   - r-data.table
   - bioconductor-phyloseq
-  - r-ldavis 
+  - r-ldavis
+
 
   
