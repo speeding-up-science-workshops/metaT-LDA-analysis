@@ -1,0 +1,119 @@
+---
+title: "Untitled"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+#rm(list = ls())
+```
+
+```{r}
+library('topicmodels')
+library('reshape2')
+library('dplyr')
+library('bbmle')
+library('ggplot2')
+library('tidytext')
+library('data.table')
+library(MetaTopics)
+library(LDAvis)
+```
+
+```{r import samples}
+count<-read.table(file = "~/Desktop/LDA-binder/KEGG_module_TPM.tsv", sep = '\t', header = TRUE, row.names=1)
+count<-(as.data.frame(t(count)))
+count
+```
+
+```{r convert to integers}
+#If you want to remove rownames 
+#rownames(count) <- c()
+#count<-as.data.frame(count)
+#Convert to integers
+count[1:43] <- lapply(count[1:43], as.integer)
+count
+```
+##LDA 
+##Ideally you would want to perform a a form of normalization procedure prior to performing a LDA analysis. Each dataset will require careful thought as to which normalization method would be ideal. Consult papers.
+
+```{r run the lda program}
+VEM2= LDA(count, k = 2, method = "Gibbs")
+VEM3= LDA(count, k = 3, method = "Gibbs")
+VEM4= LDA(count, k = 4, method = "Gibbs")
+VEM5= LDA(count, k = 5, method = "Gibbs")
+#Saved R otuput because the program took a while to run last time. 
+#saveRDS(VEM4, "VEM4.rds")
+#VEM4<-readRDS("~/VEM4.rds")
+#AICtab(VEM2,VEM3,VEM4,VEM5)
+#Plot beta scores
+##Creates a plot of LD LASSO estimates using the physical map, bpmap
+plot_beta(VEM4,prob=0.01)
+```
+
+
+```{r create html interactive plot}
+#tutorial: https://github.com/cpsievert/LDAvis
+
+topicmodels2LDAvis <- function(x, ...){
+  post <- topicmodels::posterior(x)
+  if (ncol(post[["topics"]]) < 3) stop("The model must contain > 2 topics")
+  mat <- x@wordassignments
+  LDAvis::createJSON(
+    phi = post[["terms"]], 
+    theta = post[["topics"]],
+    vocab = colnames(post[["terms"]]),
+    doc.length = slam::row_sums(mat, na.rm = TRUE),
+    term.frequency = slam::col_sums(mat, na.rm = TRUE)
+  )
+}
+serVis(topicmodels2LDAvis(VEM4))
+```
+
+```{r investigating top terms}
+
+# look at the specific assignment of species to a community
+ap_lda_td <- data.table(tidy(VEM4))
+nrow(ap_lda_td[topic==1])
+
+
+ap_top_terms <- ap_lda_td %>%
+  group_by(topic) %>%
+  top_n(10, beta) %>%
+  ungroup() %>%
+  arrange(topic, -beta)
+
+ap_top_terms %>%
+  mutate(term = reorder(term, beta)) %>%
+  ggplot(aes(term, beta, fill = factor(topic))) +
+  geom_bar(stat = "identity", show.legend = FALSE) +
+  facet_wrap(~ topic, scales = "free") +
+  coord_flip() 
+```
+
+```{r melt}
+count<-read.csv("~/Desktop/LDA-binder/KEGG_module_TPM.csv", header=T, row.names=1)
+count<-t(count)
+count
+count[1,1:43][count[1,1:43]>1]<- "Low_A"
+count[2,1:43][count[2,1:43]>1]<- "Low_B"
+count[3,1:43][count[3,1:43]>1]<- "High_A"
+count[4,1:43][count[4,1:43]>1]<- "High_B"
+mcount<-melt(count)
+mcount<-mcount %>% rename_at("Var2",~"term") 
+mcount
+```
+
+```{r Gamme plot}
+ap_gamma <- data.table(tidy(VEM4, matrix = "gamma"))
+ap_gamma$Sample <- rep(mcount$Var1,5)
+ap_gamma$Function <- rep(mcount$term,5)
+ap_gamma %>%
+  ggplot(aes(Function, gamma, fill = factor(Sample))) +
+  geom_bar(stat = "identity", show.legend = FALSE) +
+  facet_wrap(~ Sample, scales = "free") +
+  coord_flip()
+```
