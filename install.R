@@ -1,4 +1,13 @@
 install.packages("devtools")
 devtools::install_github("bm2-lab/MetaTopics")
 install.packages("LDAvis")
+install.packages("topicmodels")
+install.packages("reshape2")
+install.packages("dplyr")
+install.packages("bbmle")
+install.packages("ggplot2")
+install.packages("tidytext")
+install.packages("data.table")
+source("http://bioconductor.org/biocLite.R")
+biocLite("phyloseq")
 
