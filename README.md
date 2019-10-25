@@ -15,4 +15,4 @@ Latent Dirichlet Allocation (LDA) is used to help determine relationships and st
 
 Anand Roopsind, Stephanie F. Hudon and Bianca R.P. Brown
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/Biancabrown/LDA_binder_2/master?urlpath=rstudio)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/speeding-up-science-workshops/metaT-LDA-analysis.git/4008234?filepath=lda_md.Rmd)
